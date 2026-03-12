@@ -32,7 +32,7 @@ function ScrollToTop() {
 }
 
 function AppRouter() {
-  const [location] = useLocation();
+const [location] = useHashLocation();
   // Check if current route is admin route
  // Check if current route is admin route - Fix for hash routing
 const isAdminRoute = location.startsWith('/admin') || window.location.hash.startsWith('#/admin');
