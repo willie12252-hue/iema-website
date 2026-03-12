@@ -66,7 +66,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-border/40 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground/60">
-          <p>© 2026 IEMA 國際精油醫學協會. All rights reserved.</p>
+<p>© 2026 中華國際自然醫學協會 c-ina. All rights reserved.</p>
           <p>Designed with Nature & Science.</p>
         </div>
       </div>
