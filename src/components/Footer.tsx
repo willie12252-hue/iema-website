@@ -30,14 +30,6 @@ export default function Footer() {
               <li><a href="#/courses" className="hover:text-primary transition-colors">專業課程</a></li>
               <li><a href="#/activities" className="hover:text-primary transition-colors">會員活動</a></li>
               <li><a href="#/academy" className="hover:text-primary transition-colors">芳療學苑</a></li>
-              <li className="pt-2 mt-2 border-t border-gray-100">
-              <a
-  href="/#/admin/login"
-  className="hover:text-primary transition-colors text-xs flex items-center gap-1 opacity-70 hover:opacity-100"
->
-  管理員登入
-</a>
-              </li>
             </ul>
           </div>
 
