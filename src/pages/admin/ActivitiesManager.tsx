@@ -4,6 +4,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/lib/supabase';
+import activitySeminar from "@/assets/activity-seminar.jpeg";
+import activityOnline from "@/assets/activity-online-v2.jpg";
+import activityWorkshop from "@/assets/activity-workshop-v2.jpg";
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
@@ -183,7 +186,18 @@ export default function ActivitiesManager() {
         {loading ? <p>載入中...</p> : activities.map((item: Activity) => (
           <Card key={item.id} className="overflow-hidden">
             <div className="aspect-[4/3] bg-slate-100 relative">
-              <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" />
+              <img
+                src={
+                  item.image_url ||
+                  (item.type === 'seminar'
+                    ? activitySeminar
+                    : item.type === 'workshop'
+                    ? activityWorkshop
+                    : activityOnline)
+                }
+                alt={item.title}
+                className="w-full h-full object-cover"
+              />
             </div>
             <CardHeader>
               <CardTitle className="line-clamp-1 text-lg">{item.title}</CardTitle>

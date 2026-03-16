@@ -200,7 +200,16 @@ export default function Activities() {
             </Carousel>
           </div>
 
-          {displayList.map((item, index) => (
+          {displayList.map((item, index) => {
+            const fallbackImage =
+              item.type === "seminar"
+                ? activitySeminar
+                : item.type === "workshop"
+                ? activityWorkshop
+                : activityOnline;
+            const imageSrc = item.image_url || fallbackImage;
+
+            return (
             <div 
               key={index} 
               className={`flex flex-col gap-8 md:gap-16 items-center ${
@@ -211,7 +220,7 @@ export default function Activities() {
               <div className="w-full md:w-1/2">
                 <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl group">
                   <img 
-                    src={item.image_url} 
+                    src={imageSrc} 
                     alt={item.title} 
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
@@ -366,7 +375,7 @@ export default function Activities() {
                 </Dialog>
               </div>
             </div>
-          ))}
+          )})}
         </div>
 
         {/* Benefits Section */}
