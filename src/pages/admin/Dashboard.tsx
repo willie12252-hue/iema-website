@@ -37,7 +37,7 @@ const Sidebar = () => (
         className="w-full" 
         onClick={async () => {
           await supabase.auth.signOut();
-          window.location.href = '/#/admin/login';
+          window.location.href = '/';
         }}
       >
         登出
