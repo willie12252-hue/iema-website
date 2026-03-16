@@ -1,5 +1,5 @@
 // src/types/contentful.ts - DEPRECATED
-export type IHeroBanner = any;
-export type IFaculty = any;
-export type ICourse = any;
-export type IActivity = any;
+export type IHeroBanner = unknown;
+export type IFaculty = unknown;
+export type ICourse = unknown;
+export type IActivity = unknown;

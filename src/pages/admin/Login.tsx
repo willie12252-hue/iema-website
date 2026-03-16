@@ -10,7 +10,7 @@ export default function AdminLogin() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [_, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,8 +30,10 @@ export default function AdminLogin() {
       if (data.user) {
         setLocation('/admin/dashboard');
       }
-    } catch (err: any) {
-      setError(err.message || '登入失敗，請檢查帳號密碼');
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : '登入失敗，請檢查帳號密碼';
+      setError(message);
     } finally {
       setLoading(false);
     }

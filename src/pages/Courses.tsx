@@ -1,6 +1,5 @@
 // src/pages/Courses.tsx - Refactored to fetch from Supabase
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { ExternalLink } from "lucide-react";
 import courseEmotional from "@/assets/course-emotional-optimized.jpg";

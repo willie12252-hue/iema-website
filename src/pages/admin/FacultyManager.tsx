@@ -8,11 +8,30 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 
+interface FacultyFormValues {
+  name: string;
+  title: string;
+  description: string;
+  details?: string;
+  expertise?: string;
+  image: FileList;
+}
+
+interface Faculty {
+  id: string;
+  name: string;
+  title: string;
+  description: string;
+  details?: string;
+  image_url: string;
+  expertise: string[];
+}
+
 export default function FacultyManager() {
-  const [faculty, setFaculty] = useState<any[]>([]);
+  const [faculty, setFaculty] = useState<Faculty[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset } = useForm<FacultyFormValues>();
 
   const fetchFaculty = async () => {
     setLoading(true);
@@ -23,10 +42,11 @@ export default function FacultyManager() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchFaculty();
   }, []);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: FacultyFormValues) => {
     // 1. Upload Image to Storage
     const file = data.image[0];
     if (!file) return alert('請選擇圖片');

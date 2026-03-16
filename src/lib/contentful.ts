@@ -3,7 +3,7 @@
 // However, to prevent build errors before full refactor, we keep dummy exports
 // that return empty arrays or mimic the interface so existing components don't crash.
 
-export const getImageUrl = (image: any): string => '';
+export const getImageUrl = (): string => '';
 export const getHeroBanners = async () => [];
 export const getFaculty = async () => [];
 export const getCourses = async () => [];

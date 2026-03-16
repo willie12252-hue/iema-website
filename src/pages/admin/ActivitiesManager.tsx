@@ -8,11 +8,40 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 
+interface ActivityFormValues {
+  title: string;
+  description: string;
+  tag: string;
+  type: string;
+  date?: string;
+  location?: string;
+  fee?: string;
+  registration_info?: string;
+  registration_link?: string;
+  show_registration: string;
+  image: FileList;
+}
+
+interface Activity {
+  id: string;
+  title: string;
+  description: string;
+  tag: string;
+  type: string;
+  image_url: string;
+  date?: string;
+  location?: string;
+  fee?: string;
+  registration_info?: string;
+  registration_link?: string;
+  show_registration?: boolean;
+}
+
 export default function ActivitiesManager() {
-  const [activities, setActivities] = useState<any[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset } = useForm<ActivityFormValues>();
 
   const fetchActivities = async () => {
     setLoading(true);
@@ -23,10 +52,11 @@ export default function ActivitiesManager() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchActivities();
   }, []);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: ActivityFormValues) => {
     // 1. Upload Image to Storage
     const file = data.image[0];
     if (!file) return alert('請選擇圖片');
@@ -150,7 +180,7 @@ export default function ActivitiesManager() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading ? <p>載入中...</p> : activities.map((item) => (
+        {loading ? <p>載入中...</p> : activities.map((item: Activity) => (
           <Card key={item.id} className="overflow-hidden">
             <div className="aspect-[4/3] bg-slate-100 relative">
               <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" />

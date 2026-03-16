@@ -2,6 +2,7 @@ import { Link, Route, Switch, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
+import type { User } from '@supabase/supabase-js';
 
 import FacultyManager from './FacultyManager';
 import CoursesManager from './CoursesManager';
@@ -84,7 +85,7 @@ const DashboardHome = () => {
 };
 
 export default function AdminDashboard() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [location, setLocation] = useLocation();
 
   useEffect(() => {

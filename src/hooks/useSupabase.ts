@@ -12,7 +12,7 @@ export const useSupabase = <T>(
 ) => {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,7 +46,7 @@ export const useSupabase = <T>(
     };
 
     fetchData();
-  }, [table]);
+  }, [table, options]);
 
   return { data, loading, error };
 };

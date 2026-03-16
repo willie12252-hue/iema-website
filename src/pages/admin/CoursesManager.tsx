@@ -8,11 +8,28 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 
+interface CourseFormValues {
+  title: string;
+  description: string;
+  link: string;
+  button_text: string;
+  image: FileList;
+}
+
+interface Course {
+  id: string;
+  title: string;
+  description: string;
+  link: string;
+  button_text: string;
+  image_url: string;
+}
+
 export default function CoursesManager() {
-  const [courses, setCourses] = useState<any[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset } = useForm<CourseFormValues>();
 
   const fetchCourses = async () => {
     setLoading(true);
@@ -23,10 +40,11 @@ export default function CoursesManager() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCourses();
   }, []);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: CourseFormValues) => {
     // 1. Upload Image to Storage
     const file = data.image[0];
     if (!file) return alert('請選擇圖片');

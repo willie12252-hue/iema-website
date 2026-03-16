@@ -17,7 +17,7 @@ import Autoplay from "embla-carousel-autoplay";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, Calendar, MapPin, Ticket, CheckCircle2, User, Phone, Mail, FileText } from "lucide-react";
+import { ArrowRight, Calendar, MapPin, Ticket, User, Phone, Mail, FileText } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -128,7 +128,7 @@ export default function Activities() {
             setGalleryImages(allImages);
           } else {
              // Fallback to main images if no gallery
-             setGalleryImages(data.map((a: any) => a.image_url));
+             setGalleryImages((data as ActivityItem[]).map((a) => a.image_url));
           }
         } else {
           setActivities(defaultActivities);
