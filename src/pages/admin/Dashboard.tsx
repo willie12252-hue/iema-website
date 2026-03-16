@@ -37,7 +37,7 @@ const Sidebar = () => (
         className="w-full" 
         onClick={async () => {
           await supabase.auth.signOut();
-          window.location.href = '/';
+          window.location.replace('https://www.c-ina.org/#/');
         }}
       >
         登出
