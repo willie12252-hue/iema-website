@@ -10,44 +10,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import type { HeroBanner as HeroBannerType } from "@/lib/supabase";
+import { useRef } from "react";
 
 export default function HeroBanner() {
   const plugin = useRef(
     Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })
   );
-
-  const [banners, setBanners] = useState<HeroBannerType[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchBanners = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('hero_banners')
-          .select('*')
-          .order('display_order', { ascending: true });
-
-        if (error) {
-          console.error("Failed to fetch banners:", error);
-          setBanners([]);
-        } else if (data && data.length > 0) {
-          setBanners(data as HeroBannerType[]);
-        } else {
-          setBanners([]);
-        }
-      } catch (error) {
-        console.error("Exception fetching banners:", error);
-        setBanners([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBanners();
-  }, []);
 
   // Default banners if no Supabase data
   const defaultBanners = [
@@ -56,7 +24,7 @@ export default function HeroBanner() {
     { id: '3', image_url: banner3, title: 'Courses' },
   ];
 
-  const displayBanners = banners.length > 0 ? banners : defaultBanners;
+  const displayBanners = defaultBanners;
 
   return (
     <section className="relative w-full bg-white flex justify-center py-6">

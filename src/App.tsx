@@ -32,10 +32,12 @@ function ScrollToTop() {
 }
 
 function AppRouter() {
-  const [location] = useLocation();
+  // Use hash location hook directly here because we are outside the Router context
+  const [location] = useHashLocation();
   // Check if current route is admin route
- // Check if current route is admin route - Fix for hash routing
-const isAdminRoute = location.startsWith('/admin') || window.location.hash.startsWith('#/admin');
+  // Note: depending on how wouter/hash behaves, location may include or omit the leading '#'
+  // To be safe, treat any URL containing '/admin' as an admin route.
+  const isAdminRoute = location.includes('/admin');
 
   return (
     <Router hook={useHashLocation}>
