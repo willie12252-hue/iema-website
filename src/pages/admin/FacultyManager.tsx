@@ -31,7 +31,14 @@ export default function FacultyManager() {
   const [faculty, setFaculty] = useState<Faculty[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [editingFaculty, setEditingFaculty] = useState<Faculty | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
   const { register, handleSubmit, reset } = useForm<FacultyFormValues>();
+  const {
+    register: registerEdit,
+    handleSubmit: handleEditSubmit,
+    reset: resetEdit,
+  } = useForm<FacultyFormValues>();
 
   const fetchFaculty = async () => {
     setLoading(true);
@@ -89,6 +96,76 @@ export default function FacultyManager() {
     const { error } = await supabase.from('faculty').delete().eq('id', id);
     if (error) alert('刪除失敗');
     else fetchFaculty();
+  };
+
+  const openEditDialog = (member: Faculty) => {
+    setEditingFaculty(member);
+    resetEdit({
+      name: member.name,
+      title: member.title,
+      description: member.description,
+      details: member.details,
+      expertise: member.expertise?.join(', '),
+      image: undefined as unknown as FileList,
+    });
+    setEditOpen(true);
+  };
+
+  const onEditSubmit = async (data: FacultyFormValues) => {
+    if (!editingFaculty) return;
+
+    let imageUrl = editingFaculty.image_url;
+    const file = data.image?.[0];
+    if (file) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `faculty/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        alert('圖片上傳失敗');
+        return;
+      }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('images').getPublicUrl(filePath);
+      imageUrl = publicUrl;
+    }
+
+    const expertiseArr = data.expertise
+      ? data.expertise
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+
+    const { error: updateError } = await supabase
+      .from('faculty')
+      .update({
+        name: data.name,
+        title: data.title,
+        description: data.description,
+        details: data.details,
+        expertise: expertiseArr,
+        image_url: imageUrl,
+      })
+      .eq('id', editingFaculty.id);
+
+    if (updateError) {
+      console.error('Update error:', updateError);
+      alert('更新失敗，請稍後再試');
+      return;
+    }
+
+    alert('更新成功！');
+    setEditOpen(false);
+    setEditingFaculty(null);
+    resetEdit();
+    fetchFaculty();
   };
 
   return (
@@ -149,13 +226,59 @@ export default function FacultyManager() {
             <CardContent>
               <p className="text-sm text-muted-foreground line-clamp-2">{item.description}</p>
               <div className="mt-4 flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => alert('編輯功能開發中')}>編輯</Button>
+                <Button variant="outline" size="sm" onClick={() => openEditDialog(item)}>
+                  編輯
+                </Button>
                 <Button variant="destructive" size="sm" onClick={() => handleDelete(item.id)}>刪除</Button>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {/* 編輯師資 Dialog */}
+      <Dialog
+        open={editOpen}
+        onOpenChange={(openValue) => {
+          setEditOpen(openValue);
+          if (!openValue) setEditingFaculty(null);
+        }}
+      >
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>編輯師資</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditSubmit(onEditSubmit)} className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">姓名</label>
+              <Input {...registerEdit('name')} required placeholder="王大明" />
+            </div>
+            <div>
+              <label className="text-sm font-medium">職稱</label>
+              <Input {...registerEdit('title')} required placeholder="資深芳療講師" />
+            </div>
+            <div>
+              <label className="text-sm font-medium">簡介 (顯示於卡片)</label>
+              <Textarea {...registerEdit('description')} required placeholder="簡短介紹..." />
+            </div>
+            <div>
+              <label className="text-sm font-medium">詳細經歷 (彈窗內容)</label>
+              <Textarea {...registerEdit('details')} className="h-32" placeholder="詳細經歷與證照..." />
+            </div>
+            <div>
+              <label className="text-sm font-medium">專長 (用逗號分隔)</label>
+              <Input {...registerEdit('expertise')} placeholder="芳療, 按摩, 經絡" />
+            </div>
+            <div>
+              <label className="text-sm font-medium">照片（如不更換可留白）</label>
+              <Input type="file" accept="image/*" {...registerEdit('image')} />
+            </div>
+            <Button type="submit" className="w-full bg-[#899D5B] hover:bg-[#76894A]">
+              儲存變更
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -29,7 +29,14 @@ export default function CoursesManager() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
   const { register, handleSubmit, reset } = useForm<CourseFormValues>();
+  const {
+    register: registerEdit,
+    handleSubmit: handleEditSubmit,
+    reset: resetEdit,
+  } = useForm<CourseFormValues>();
 
   const fetchCourses = async () => {
     setLoading(true);
@@ -88,6 +95,67 @@ export default function CoursesManager() {
     else fetchCourses();
   };
 
+  const openEditDialog = (course: Course) => {
+    setEditingCourse(course);
+    resetEdit({
+      title: course.title,
+      description: course.description,
+      link: course.link,
+      button_text: course.button_text,
+      image: undefined as unknown as FileList,
+    });
+    setEditOpen(true);
+  };
+
+  const onEditSubmit = async (data: CourseFormValues) => {
+    if (!editingCourse) return;
+
+    let imageUrl = editingCourse.image_url;
+    const file = data.image?.[0];
+    if (file) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `courses/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        alert('圖片上傳失敗');
+        return;
+      }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('images').getPublicUrl(filePath);
+      imageUrl = publicUrl;
+    }
+
+    const { error: updateError } = await supabase
+      .from('courses')
+      .update({
+        title: data.title,
+        description: data.description,
+        link: data.link,
+        button_text: data.button_text,
+        image_url: imageUrl,
+      })
+      .eq('id', editingCourse.id);
+
+    if (updateError) {
+      console.error('Update error:', updateError);
+      alert('更新失敗，請稍後再試');
+      return;
+    }
+
+    alert('更新成功！');
+    setEditOpen(false);
+    setEditingCourse(null);
+    resetEdit();
+    fetchCourses();
+  };
+
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
@@ -139,6 +207,9 @@ export default function CoursesManager() {
             <CardContent>
               <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{item.description}</p>
               <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => openEditDialog(item)}>
+                  編輯
+                </Button>
                 <Button variant="outline" size="sm" asChild>
                   <a href={item.link} target="_blank" rel="noreferrer">預覽連結</a>
                 </Button>
@@ -148,6 +219,46 @@ export default function CoursesManager() {
           </Card>
         ))}
       </div>
+
+      {/* 編輯課程 Dialog */}
+      <Dialog
+        open={editOpen}
+        onOpenChange={(openValue) => {
+          setEditOpen(openValue);
+          if (!openValue) setEditingCourse(null);
+        }}
+      >
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>編輯課程</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditSubmit(onEditSubmit)} className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">課程名稱</label>
+              <Input {...registerEdit('title')} required placeholder="情緒芳療師認證課程" />
+            </div>
+            <div>
+              <label className="text-sm font-medium">簡介</label>
+              <Textarea {...registerEdit('description')} required placeholder="課程內容..." />
+            </div>
+            <div>
+              <label className="text-sm font-medium">報名連結 (Google Form 或 線上課程連結)</label>
+              <Input {...registerEdit('link')} required placeholder="https://..." />
+            </div>
+            <div>
+              <label className="text-sm font-medium">按鈕文字</label>
+              <Input {...registerEdit('button_text')} required />
+            </div>
+            <div>
+              <label className="text-sm font-medium">封面圖片（如不更換可留白）</label>
+              <Input type="file" accept="image/*" {...registerEdit('image')} />
+            </div>
+            <Button type="submit" className="w-full bg-[#899D5B] hover:bg-[#76894A]">
+              儲存變更
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
