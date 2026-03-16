@@ -44,7 +44,14 @@ export default function ActivitiesManager() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
   const { register, handleSubmit, reset } = useForm<ActivityFormValues>();
+  const {
+    register: registerEdit,
+    handleSubmit: handleEditSubmit,
+    reset: resetEdit,
+  } = useForm<ActivityFormValues>();
 
   const fetchActivities = async () => {
     setLoading(true);
@@ -106,8 +113,89 @@ export default function ActivitiesManager() {
   const handleDelete = async (id: string) => {
     if (!confirm('確定要刪除嗎？')) return;
     const { error } = await supabase.from('activities').delete().eq('id', id);
-    if (error) alert('刪除失敗');
-    else fetchActivities();
+    if (error) {
+      console.error('Delete error:', error);
+      alert(`刪除失敗：${error.message ?? '請稍後再試'}`);
+    } else {
+      await fetchActivities();
+      alert('已刪除活動');
+    }
+  };
+
+  const openEditDialog = (activity: Activity) => {
+    setEditingActivity(activity);
+    resetEdit({
+      title: activity.title,
+      description: activity.description,
+      tag: activity.tag,
+      type: activity.type,
+      date: activity.date ? activity.date.substring(0, 10) : undefined,
+      location: activity.location,
+      fee: activity.fee,
+      registration_info: activity.registration_info,
+      registration_link: activity.registration_link,
+      show_registration: activity.show_registration ? 'true' : 'false',
+      // 編輯時圖片不是必填，因此不預先帶入
+      image: undefined as unknown as FileList,
+    });
+    setEditOpen(true);
+  };
+
+  const onEditSubmit = async (data: ActivityFormValues) => {
+    if (!editingActivity) return;
+
+    let imageUrl = editingActivity.image_url;
+
+    const file = data.image?.[0];
+    if (file) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `activities/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        alert('圖片上傳失敗');
+        return;
+      }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('images').getPublicUrl(filePath);
+      imageUrl = publicUrl;
+    }
+
+    const { error: updateError } = await supabase
+      .from('activities')
+      .update({
+        title: data.title,
+        description: data.description,
+        tag: data.tag,
+        type: data.type,
+        image_url: imageUrl,
+        date: data.date ? new Date(data.date).toISOString() : null,
+        location: data.location,
+        fee: data.fee,
+        registration_info: data.registration_info,
+        registration_link: data.registration_link,
+        show_registration: data.show_registration === 'true',
+      })
+      .eq('id', editingActivity.id);
+
+    if (updateError) {
+      console.error('Update error:', updateError);
+      alert('更新失敗，請稍後再試');
+      return;
+    }
+
+    alert('更新成功！');
+    setEditOpen(false);
+    setEditingActivity(null);
+    resetEdit();
+    fetchActivities();
   };
 
   return (
@@ -209,12 +297,91 @@ export default function ActivitiesManager() {
             <CardContent>
               <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{item.description}</p>
               <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => openEditDialog(item)}
+                >
+                  編輯
+                </Button>
                 <Button variant="destructive" size="sm" onClick={() => handleDelete(item.id)}>刪除</Button>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {/* 編輯活動 Dialog */}
+      <Dialog open={editOpen} onOpenChange={(openValue) => {
+        setEditOpen(openValue);
+        if (!openValue) {
+          setEditingActivity(null);
+        }
+      }}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>編輯活動</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditSubmit(onEditSubmit)} className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">活動標題</label>
+              <Input {...registerEdit('title')} required placeholder="自然醫學研討會" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">標籤 (Tag)</label>
+                <Input {...registerEdit('tag')} required placeholder="研討會" />
+              </div>
+              <div>
+                <label className="text-sm font-medium">類型 (Type)</label>
+                <select {...registerEdit('type')} className="w-full border rounded p-2 text-sm">
+                  <option value="other">其他</option>
+                  <option value="workshop">工作坊</option>
+                  <option value="seminar">研討會</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium">活動日期</label>
+              <Input type="date" {...registerEdit('date')} />
+            </div>
+            <div>
+              <label className="text-sm font-medium">地點</label>
+              <Input {...registerEdit('location')} placeholder="台北市..." />
+            </div>
+            <div>
+              <label className="text-sm font-medium">費用說明</label>
+              <Input {...registerEdit('fee')} placeholder="會員免費..." />
+            </div>
+            <div>
+              <label className="text-sm font-medium">活動簡介</label>
+              <Textarea {...registerEdit('description')} required className="h-24" />
+            </div>
+            <div>
+              <label className="text-sm font-medium">報名說明</label>
+              <Input {...registerEdit('registration_info')} placeholder="請致電..." />
+            </div>
+            <div>
+              <label className="text-sm font-medium">報名連結 (選填)</label>
+              <Input {...registerEdit('registration_link')} placeholder="https://..." />
+            </div>
+            <div>
+              <label className="text-sm font-medium">啟用網站內建報名表單？</label>
+              <select {...registerEdit('show_registration')} className="w-full border rounded p-2 text-sm">
+                <option value="false">否</option>
+                <option value="true">是</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium">封面圖片（如不更換可留白）</label>
+              <Input type="file" accept="image/*" {...registerEdit('image')} />
+            </div>
+            <Button type="submit" className="w-full bg-[#899D5B] hover:bg-[#76894A]">
+              儲存變更
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
