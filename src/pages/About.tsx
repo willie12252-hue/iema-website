@@ -197,8 +197,8 @@ export default function About() {
                   <div className="space-y-4 text-muted-foreground">
                     <p>如果您對課程、認證或加入協會感興趣，歡迎透過表單或以下方式聯繫我們。</p>
                     <div className="pt-4 space-y-2">
-                      <p><strong className="text-foreground">電話：</strong> 02-2508-0218</p>
-                      <p><strong className="text-foreground">Email：</strong> willie1225@gmail.com</p>
+                      <p><strong className="text-foreground">電話：</strong> 0955541548</p>
+                      <p><strong className="text-foreground">Email：</strong> lp36andy@gmail.com</p>
                       <p><strong className="text-foreground">地址：</strong> 台北市中山區南京東路二段140號6樓</p>
                     </div>
                   </div>

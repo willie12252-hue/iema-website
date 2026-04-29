@@ -43,11 +43,11 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-primary shrink-0" />
-                <span>02-2508-0218</span>
+                <span>0955541548</span>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-primary shrink-0" />
-                <span>willie1225@gmail.com</span>
+                <span>lp36andy@gmail.com</span>
               </div>
               <div className="flex items-center gap-3">
                 <Facebook className="w-4 h-4 text-primary shrink-0" />
