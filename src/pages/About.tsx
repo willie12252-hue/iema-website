@@ -102,7 +102,7 @@ export default function About() {
                 
                 <div className="mt-8 p-6 bg-primary/5 rounded-xl border border-primary/10">
                   <p className="font-bold text-foreground mb-1">聯絡方式</p>
-                  <p className="text-primary font-serif text-xl">中華國際自然醫學協會 📞 02-2508-0218</p>
+                  <p className="text-primary font-serif text-xl">中華國際自然醫學協會 📞 0955541548</p>
                 </div>
               </div>
 
