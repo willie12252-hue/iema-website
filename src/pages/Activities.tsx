@@ -389,8 +389,18 @@ export default function Activities() {
                 加入我們的大家庭，就能優先參與協會主辦的活動，不論是線上講座、實體課程、體驗工作坊或研討會，都有專屬的報名優惠與保留名額。我們希望會員們在每一次學習與交流中，都能感受到被照顧與陪伴。如果您目前還不是會員，也歡迎參與活動，只是無法享有這些貼心的專屬福利。誠摯邀請您成為我們的會員，一起在自然醫學的路上，相伴前行、彼此成長。
               </p>
               <div className="mt-8">
-                <Button size="lg" className="bg-[#899D5B] hover:bg-[#76894A] text-white rounded-full px-8 text-lg shadow-lg hover:shadow-xl transition-all">
-                  立即加入會員
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-[#899D5B] hover:bg-[#76894A] text-white rounded-full px-8 text-lg shadow-lg hover:shadow-xl transition-all"
+                >
+                  <a
+                    href="https://docs.google.com/forms/d/1L8dIyPgbEgFZwSf1WIwKidq7j1x0U9u--RRznryTGec/viewform?edit_requested=true"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    立即加入會員
+                  </a>
                 </Button>
               </div>
             </CardContent>

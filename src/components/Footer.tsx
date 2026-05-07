@@ -39,15 +39,15 @@ export default function Footer() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-muted-foreground">
               <div className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-primary shrink-0 mt-1" />
-                <span>台北市中山區南京東路二段140號6樓</span>
+                <span>地址：台北市中山區南京東路二段140號6樓</span>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-primary shrink-0" />
-                <span>0955541548</span>
+                <span>Tel：0955541548</span>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-primary shrink-0" />
-                <span>lp36andy@gmail.com</span>
+                <span>Email：lp36andy@gmail.com</span>
               </div>
               <div className="flex items-center gap-3">
                 <Facebook className="w-4 h-4 text-primary shrink-0" />
